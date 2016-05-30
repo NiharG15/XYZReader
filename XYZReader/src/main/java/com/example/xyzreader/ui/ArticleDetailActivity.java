@@ -193,10 +193,10 @@ public class ArticleDetailActivity extends AppCompatActivity
         super.finishAfterTransition();
     }
 
-    @Override
-    public void onBackPressed() {
-        finishAfterTransition();
-    }
+//    @Override
+//    public void onBackPressed() {
+//        finishAfterTransition();
+//    }
 
     @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
