@@ -6,11 +6,9 @@ import android.content.Intent;
 import android.content.Loader;
 import android.database.Cursor;
 import android.graphics.Bitmap;
-import android.graphics.Rect;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ActivityCompat;
@@ -20,9 +18,6 @@ import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.text.format.DateUtils;
 import android.text.method.LinkMovementMethod;
-import android.transition.AutoTransition;
-import android.transition.Transition;
-import android.transition.TransitionInflater;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -65,6 +60,8 @@ public class ArticleDetailFragment extends Fragment implements
     private Toolbar mToolbar;
     private CollapsingToolbarLayout mCollapsingToolbarLayout;
     private AppBarLayout mAppBarLayout;
+    private boolean collapsed = false;
+
     /**
      * Mandatory empty constructor for the fragment manager to instantiate the
      * fragment (e.g. upon screen orientation changes).
@@ -144,38 +141,38 @@ public class ArticleDetailFragment extends Fragment implements
         bindViews();
 
         mToolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
-        mAppBarLayout = (AppBarLayout) mRootView.findViewById(R.id.appbar_detail);
-        getActivityCast().setSupportActionBar(mToolbar);
-        getActivityCast().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getActivityCast().getSupportActionBar().setHomeButtonEnabled(true);
-        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getActivityCast().onBackPressed();
-            }
-        });
-        mToolbar.setTitle("");
+        if (mToolbar != null) {
+            mAppBarLayout = (AppBarLayout) mRootView.findViewById(R.id.appbar_detail);
+            getActivityCast().setSupportActionBar(mToolbar);
+            getActivityCast().getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getActivityCast().getSupportActionBar().setHomeButtonEnabled(true);
+            mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    getActivityCast().onBackPressed();
+                }
+            });
+            mToolbar.setTitle("");
 
-        if (Utils.isLollipopOrUp() && getActivityCast().getSelectedItemId() == mItemId) {
-            Intent i = getActivityCast().getIntent();
-            String transitionName = "image_" + i.getIntExtra(ArticleDetailActivity.ARG_POSITION, 0);
-            mPhotoView.setTransitionName(transitionName);
-            mToolbar.setTransitionName("toolbar");
-            Log.d(this.toString(), "Transition Name set");
+            if (Utils.isLollipopOrUp() && getActivityCast().getSelectedItemId() == mItemId) {
+                Intent i = getActivityCast().getIntent();
+                String transitionName = "image_" + i.getIntExtra(ArticleDetailActivity.ARG_POSITION, 0);
+                mPhotoView.setTransitionName(transitionName);
+                mToolbar.setTransitionName("toolbar");
+                Log.d(this.toString(), "Transition Name set");
+            }
+
+            final int offset = getResources().getDimensionPixelSize(R.dimen.collapsed_offset);
+            mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
+                @Override
+                public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
+                    collapsed = verticalOffset <= -offset;
+                }
+            });
         }
-
-        final int offset = getResources().getDimensionPixelSize(R.dimen.collapsed_offset);
-        mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
-            @Override
-            public void onOffsetChanged(AppBarLayout appBarLayout, int verticalOffset) {
-                collapsed = verticalOffset <= -offset;
-            }
-        });
-
         return mRootView;
     }
 
-    private boolean collapsed = false;
     public ImageView getPhotoView() {
         return collapsed ? null : mPhotoView;
     }

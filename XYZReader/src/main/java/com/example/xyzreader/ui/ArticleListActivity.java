@@ -50,6 +50,7 @@ import java.util.Map;
 public class ArticleListActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
+    public static final String TAG = ArticleDetailActivity.class.getSimpleName();
     public static final String EXTRA_OLD_ITEM_POSITION = "old_item";
     public static final String EXTRA_NEW_ITEM_POSITION = "new_item";
 
@@ -93,6 +94,8 @@ public class ArticleListActivity extends AppCompatActivity implements
         }
     };
 
+    private boolean mTwoPane;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -100,7 +103,8 @@ public class ArticleListActivity extends AppCompatActivity implements
             setExitSharedElementCallback(callback);
         }
         setContentView(R.layout.activity_article_list);
-
+        mTwoPane = findViewById(R.id.fragment_container) != null;
+        Log.d(TAG, "onCreate: " + mTwoPane);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mAppBarLayout = (AppBarLayout) findViewById(R.id.toolbar_container);
         setSupportActionBar(mToolbar);
@@ -219,16 +223,20 @@ public class ArticleListActivity extends AppCompatActivity implements
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    Pair p1 = Pair.create(mToolbar, "toolbar");
-                    Pair p2 = Pair.create(vh.thumbnailView, "image_" + vh.getAdapterPosition());
-                    ActivityOptionsCompat aco = ActivityOptionsCompat.makeSceneTransitionAnimation(ArticleListActivity.this,
-                            p1, p2);
-                    Intent i = new Intent(Intent.ACTION_VIEW,
-                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
-                    i.putExtra(ArticleDetailActivity.ARG_POSITION, vh.getAdapterPosition());
-                    ActivityCompat.startActivity(ArticleListActivity.this, i, aco.toBundle());
+                    if (!mTwoPane) {
+                        Pair p1 = Pair.create(mToolbar, "toolbar");
+                        Pair p2 = Pair.create(vh.thumbnailView, "image_" + vh.getAdapterPosition());
+                        ActivityOptionsCompat aco = ActivityOptionsCompat.makeSceneTransitionAnimation(ArticleListActivity.this,
+                                p1, p2);
+                        Intent i = new Intent(Intent.ACTION_VIEW,
+                                ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
+                        i.putExtra(ArticleDetailActivity.ARG_POSITION, vh.getAdapterPosition());
+                        ActivityCompat.startActivity(ArticleListActivity.this, i, aco.toBundle());
 //                    startActivity(new Intent(Intent.ACTION_VIEW,
 //                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))));
+                    } else {
+                        getFragmentManager().beginTransaction().replace(R.id.fragment_container, ArticleDetailFragment.newInstance(getItemId(vh.getAdapterPosition()))).commit();
+                    }
                 }
             });
             return vh;
