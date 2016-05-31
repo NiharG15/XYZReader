@@ -54,8 +54,7 @@ public class ArticleDetailFragment extends Fragment implements
     private Cursor mCursor;
     private long mItemId;
     private View mRootView;
-    private int mMutedColor = 0xFF333333;
-
+    private int mColor = 0;
 
     private int mTopInset;
     //    private View mPhotoContainerView;
@@ -215,8 +214,10 @@ public class ArticleDetailFragment extends Fragment implements
                     // http://jakewharton.com/coercing-picasso-to-play-with-palette/
                     Bitmap bitmap = ((BitmapDrawable) mPhotoView.getDrawable()).getBitmap();
                     Palette palette = PaletteTransformation.getPalette(bitmap);
-                    if (palette != null)
+                    if (palette != null) {
                         applyColor(palette.getMutedColor(0xFF333333));
+                        mColor = palette.getMutedColor(0);
+                    }
                 }
 
                 @Override
@@ -350,4 +351,7 @@ public class ArticleDetailFragment extends Fragment implements
         });
     }
 
+    public int getmColor() {
+        return mColor;
+    }
 }

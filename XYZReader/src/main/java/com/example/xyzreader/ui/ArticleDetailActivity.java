@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.SharedElementCallback;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.transition.Fade;
@@ -26,6 +27,7 @@ import android.util.TypedValue;
 import android.view.Gravity;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 
 import com.example.xyzreader.R;
@@ -142,6 +144,15 @@ public class ArticleDetailActivity extends AppCompatActivity
                 mSelectedItemId = mCursor.getLong(ArticleLoader.Query._ID);
                 mCurrentPosition = position;
                 Log.d(this.toString(), "Current Position = " + mCurrentPosition + " Starting pos = " + mStartingPosition);
+                if (Utils.isLollipopOrUp()) {
+                    getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+                    int color = mPagerAdapter.getRegisteredFragment(position).getmColor();
+                    if (color != 0) {
+                        getWindow().setStatusBarColor(color);
+                    } else {
+                        getWindow().setStatusBarColor(ContextCompat.getColor(ArticleDetailActivity.this, R.color.theme_primary_dark));
+                    }
+                }
 //                updateUpButtonPosition();
             }
         });
