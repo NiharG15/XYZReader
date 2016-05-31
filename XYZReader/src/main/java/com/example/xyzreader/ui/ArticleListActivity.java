@@ -10,7 +10,6 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.os.Bundle;
-import android.support.design.widget.AppBarLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.app.SharedElementCallback;
@@ -68,7 +67,6 @@ public class ArticleListActivity extends AppCompatActivity implements
     };
 
 
-    private AppBarLayout mAppBarLayout;
 
     //Code based on https://github.com/alexjlockwood/activity-transitions
     private int mOriginalPosition;
@@ -110,7 +108,6 @@ public class ArticleListActivity extends AppCompatActivity implements
         setContentView(R.layout.activity_article_list);
         mTwoPane = findViewById(R.id.fragment_container) != null;
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
-        mAppBarLayout = (AppBarLayout) findViewById(R.id.toolbar_container);
         setSupportActionBar(mToolbar);
         getSupportActionBar().setTitle("");
 
@@ -235,8 +232,7 @@ public class ArticleListActivity extends AppCompatActivity implements
                                 ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition())));
                         i.putExtra(ArticleDetailActivity.ARG_POSITION, vh.getAdapterPosition());
                         ActivityCompat.startActivity(ArticleListActivity.this, i, aco.toBundle());
-//                    startActivity(new Intent(Intent.ACTION_VIEW,
-//                            ItemsContract.Items.buildItemUri(getItemId(vh.getAdapterPosition()))));
+
                     } else {
                         getFragmentManager().beginTransaction().replace(R.id.fragment_container, ArticleDetailFragment.newInstance(getItemId(vh.getAdapterPosition()))).commit();
                     }
