@@ -11,4 +11,7 @@
 
     <string name="transition_photo" translatable="false">photo</string>
 
+    <string name="article_byline" formatted="false">%1$s by %2$s</string>
+    <string name="cd_photo">Photo</string>
+
 </resources>

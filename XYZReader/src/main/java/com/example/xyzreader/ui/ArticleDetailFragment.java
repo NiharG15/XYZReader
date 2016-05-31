@@ -48,7 +48,6 @@ public class ArticleDetailFragment extends Fragment implements
         LoaderManager.LoaderCallbacks<Cursor> {
     public static final String ARG_ITEM_ID = "item_id";
     private static final String TAG = "ArticleDetailFragment";
-    private static final float PARALLAX_FACTOR = 1.25f;
 
     private Cursor mCursor;
     private long mItemId;
@@ -74,20 +73,6 @@ public class ArticleDetailFragment extends Fragment implements
         ArticleDetailFragment fragment = new ArticleDetailFragment();
         fragment.setArguments(arguments);
         return fragment;
-    }
-
-    static float progress(float v, float min, float max) {
-        return constrain((v - min) / (max - min), 0, 1);
-    }
-
-    static float constrain(float val, float min, float max) {
-        if (val < min) {
-            return min;
-        } else if (val > max) {
-            return max;
-        } else {
-            return val;
-        }
     }
 
     @Override
@@ -145,7 +130,6 @@ public class ArticleDetailFragment extends Fragment implements
                     String transitionName = "image_" + i.getIntExtra(ArticleDetailActivity.ARG_POSITION, 0);
                     mPhotoView.setTransitionName(transitionName);
                     mToolbar.setTransitionName("toolbar");
-                    Log.d(this.toString(), "Transition Name set");
                 }
 
             final int offset = getResources().getDimensionPixelSize(R.dimen.collapsed_offset);

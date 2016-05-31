@@ -245,13 +245,12 @@ public class ArticleListActivity extends AppCompatActivity implements
         public void onBindViewHolder(final ViewHolder holder, int position) {
             mCursor.moveToPosition(position);
             holder.titleView.setText(mCursor.getString(ArticleLoader.Query.TITLE));
-            holder.subtitleView.setText(
+            holder.subtitleView.setText(String.format(getString(R.string.article_byline),
                     DateUtils.getRelativeTimeSpanString(
                             mCursor.getLong(ArticleLoader.Query.PUBLISHED_DATE),
                             System.currentTimeMillis(), DateUtils.HOUR_IN_MILLIS,
-                            DateUtils.FORMAT_ABBREV_ALL).toString()
-                            + " by "
-                            + mCursor.getString(ArticleLoader.Query.AUTHOR));
+                            DateUtils.FORMAT_ABBREV_ALL).toString(),
+                    mCursor.getString(ArticleLoader.Query.AUTHOR)));
             Picasso.with(ArticleListActivity.this).load(mCursor.getString(ArticleLoader.Query.PHOTO_URL)).transform(PaletteTransformation.instance()).into(holder.thumbnailView,
                     new Callback() {
                         @Override

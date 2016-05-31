@@ -125,10 +125,6 @@ public class ArticleDetailActivity extends AppCompatActivity
         mPager.setPageMarginDrawable(new ColorDrawable(0x22000000));
 
         mPager.setOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
-            @Override
-            public void onPageScrollStateChanged(int state) {
-                super.onPageScrollStateChanged(state);
-            }
 
             @Override
             public void onPageSelected(int position) {
@@ -137,7 +133,6 @@ public class ArticleDetailActivity extends AppCompatActivity
                 }
                 mSelectedItemId = mCursor.getLong(ArticleLoader.Query._ID);
                 mCurrentPosition = position;
-                Log.d(this.toString(), "Current Position = " + mCurrentPosition + " Starting pos = " + mStartingPosition);
                 if (Utils.isLollipopOrUp()) {
                     getWindow().addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
                     int color = mPagerAdapter.getRegisteredFragment(position).getmColor();
