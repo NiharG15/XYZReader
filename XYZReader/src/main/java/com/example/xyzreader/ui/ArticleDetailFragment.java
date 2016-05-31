@@ -136,16 +136,6 @@ public class ArticleDetailFragment extends Fragment implements
         mPhotoView = (ImageView) mRootView.findViewById(R.id.photo);
         mCollapsingToolbarLayout = (CollapsingToolbarLayout) mRootView.findViewById(R.id.photo_container);
 
-        mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
-                        .setType("text/plain")
-                        .setText("Some sample text")
-                        .getIntent(), getString(R.string.action_share)));
-            }
-        });
-
         bindViews();
 
         mToolbar = (Toolbar) mRootView.findViewById(R.id.toolbar);
@@ -211,7 +201,15 @@ public class ArticleDetailFragment extends Fragment implements
                             + mCursor.getString(ArticleLoader.Query.AUTHOR)
                             + "</font>"));
             bodyView.setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY)));
-
+            mRootView.findViewById(R.id.share_fab).setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    startActivity(Intent.createChooser(ShareCompat.IntentBuilder.from(getActivity())
+                            .setType("text/plain")
+                            .setText(Html.fromHtml(mCursor.getString(ArticleLoader.Query.BODY)).toString())
+                            .getIntent(), getString(R.string.action_share)));
+                }
+            });
             Picasso.with(getActivity()).load(mCursor.getString(ArticleLoader.Query.PHOTO_URL)).transform(PaletteTransformation.instance()).into(mPhotoView, new Callback() {
                 @Override
                 public void onSuccess() {
