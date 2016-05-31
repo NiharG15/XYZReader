@@ -1,5 +1,9 @@
 package com.example.xyzreader.ui;
 
+import android.animation.Animator;
+import android.animation.ArgbEvaluator;
+import android.animation.ObjectAnimator;
+import android.annotation.TargetApi;
 import android.app.Fragment;
 import android.app.LoaderManager;
 import android.content.Intent;
@@ -8,7 +12,9 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Typeface;
 import android.graphics.drawable.BitmapDrawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.ColorInt;
 import android.support.design.widget.AppBarLayout;
 import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.ActivityCompat;
@@ -21,8 +27,10 @@ import android.text.method.LinkMovementMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewAnimationUtils;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -154,13 +162,14 @@ public class ArticleDetailFragment extends Fragment implements
             });
             mToolbar.setTitle("");
 
-            if (Utils.isLollipopOrUp() && getActivityCast().getSelectedItemId() == mItemId) {
-                Intent i = getActivityCast().getIntent();
-                String transitionName = "image_" + i.getIntExtra(ArticleDetailActivity.ARG_POSITION, 0);
-                mPhotoView.setTransitionName(transitionName);
-                mToolbar.setTransitionName("toolbar");
-                Log.d(this.toString(), "Transition Name set");
-            }
+            if (Utils.isLollipopOrUp())
+                if (getActivityCast().getSelectedItemId() == mItemId) {
+                    Intent i = getActivityCast().getIntent();
+                    String transitionName = "image_" + i.getIntExtra(ArticleDetailActivity.ARG_POSITION, 0);
+                    mPhotoView.setTransitionName(transitionName);
+                    mToolbar.setTransitionName("toolbar");
+                    Log.d(this.toString(), "Transition Name set");
+                }
 
             final int offset = getResources().getDimensionPixelSize(R.dimen.collapsed_offset);
             mAppBarLayout.addOnOffsetChangedListener(new AppBarLayout.OnOffsetChangedListener() {
@@ -210,7 +219,7 @@ public class ArticleDetailFragment extends Fragment implements
                     Bitmap bitmap = ((BitmapDrawable) mPhotoView.getDrawable()).getBitmap();
                     Palette palette = PaletteTransformation.getPalette(bitmap);
                     if (palette != null)
-                        mRootView.findViewById(R.id.meta_bar).setBackgroundColor(palette.getMutedColor(0xFF333333));
+                        applyColor(palette.getMutedColor(0xFF333333));
                 }
 
                 @Override
@@ -224,6 +233,80 @@ public class ArticleDetailFragment extends Fragment implements
             titleView.setText("N/A");
             bylineView.setText("N/A" );
             bodyView.setText("N/A");
+        }
+    }
+
+    private void applyColor(@ColorInt final int color) {
+        final FrameLayout colorBar = (FrameLayout) mRootView.findViewById(R.id.color_bar);
+        if (Utils.isLollipopOrUp()) {
+            //If there is shared element transition, delay the color reveal by 500 ms
+            final boolean delayed = getActivity() instanceof ArticleDetailActivity;
+            //To make sure that view is laid out before we request width and height
+            colorBar.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+                @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+                @Override
+                public void onGlobalLayout() {
+                    colorBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                    colorBar.setBackgroundColor(color);
+                    float halfWidth = colorBar.getMeasuredWidth() / 2;
+                    float height = colorBar.getMeasuredHeight();
+                    float endRadius = (float) Math.sqrt(halfWidth * halfWidth + height * height);
+                    Log.d(TAG, String.valueOf(endRadius));
+                    Animator reveal = ViewAnimationUtils.createCircularReveal(colorBar, colorBar.getRight() / 2, colorBar.getTop(), 0, endRadius);
+                    reveal.addListener(new Animator.AnimatorListener() {
+                        @Override
+                        public void onAnimationStart(Animator animator) {
+                            colorBar.setVisibility(View.VISIBLE);
+                        }
+
+                        @Override
+                        public void onAnimationEnd(Animator animator) {
+
+                        }
+
+                        @Override
+                        public void onAnimationCancel(Animator animator) {
+
+                        }
+
+                        @Override
+                        public void onAnimationRepeat(Animator animator) {
+
+                        }
+                    });
+                    if (delayed) {
+                        reveal.setStartDelay(500);
+                    }
+                    reveal.start();
+                }
+            });
+        } else {
+            //Fall back to fade animation on 19 and below
+            colorBar.setBackgroundColor(0xFF333333);
+            ObjectAnimator animator = ObjectAnimator.ofObject(colorBar, "backgroundColor", new ArgbEvaluator(), 0xFF333333, color);
+            animator.setDuration(500);
+            animator.addListener(new Animator.AnimatorListener() {
+                @Override
+                public void onAnimationStart(Animator animator) {
+                    colorBar.setVisibility(View.VISIBLE);
+                }
+
+                @Override
+                public void onAnimationEnd(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationCancel(Animator animator) {
+
+                }
+
+                @Override
+                public void onAnimationRepeat(Animator animator) {
+
+                }
+            });
+            animator.start();
         }
     }
 
