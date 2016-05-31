@@ -243,38 +243,40 @@ public class ArticleDetailFragment extends Fragment implements
                 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
                 @Override
                 public void onGlobalLayout() {
-                    colorBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
                     colorBar.setBackgroundColor(color);
                     float halfWidth = colorBar.getMeasuredWidth() / 2;
                     float height = colorBar.getMeasuredHeight();
                     float endRadius = (float) Math.sqrt(halfWidth * halfWidth + height * height);
                     Log.d(TAG, String.valueOf(endRadius));
-                    Animator reveal = ViewAnimationUtils.createCircularReveal(colorBar, colorBar.getRight() / 2, colorBar.getTop(), 0, endRadius);
-                    reveal.addListener(new Animator.AnimatorListener() {
-                        @Override
-                        public void onAnimationStart(Animator animator) {
-                            colorBar.setVisibility(View.VISIBLE);
+                    if (endRadius > 0) {
+                        colorBar.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+                        Animator reveal = ViewAnimationUtils.createCircularReveal(colorBar, colorBar.getRight() / 2, colorBar.getTop(), 0, endRadius);
+                        reveal.addListener(new Animator.AnimatorListener() {
+                            @Override
+                            public void onAnimationStart(Animator animator) {
+                                colorBar.setVisibility(View.VISIBLE);
+                            }
+
+                            @Override
+                            public void onAnimationEnd(Animator animator) {
+
+                            }
+
+                            @Override
+                            public void onAnimationCancel(Animator animator) {
+
+                            }
+
+                            @Override
+                            public void onAnimationRepeat(Animator animator) {
+
+                            }
+                        });
+                        if (delayed) {
+                            reveal.setStartDelay(500);
                         }
-
-                        @Override
-                        public void onAnimationEnd(Animator animator) {
-
-                        }
-
-                        @Override
-                        public void onAnimationCancel(Animator animator) {
-
-                        }
-
-                        @Override
-                        public void onAnimationRepeat(Animator animator) {
-
-                        }
-                    });
-                    if (delayed) {
-                        reveal.setStartDelay(500);
+                        reveal.start();
                     }
-                    reveal.start();
                 }
             });
         } else {
