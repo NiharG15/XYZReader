@@ -22,7 +22,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.text.format.DateUtils;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
@@ -80,13 +79,19 @@ public class ArticleListActivity extends AppCompatActivity implements
         public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
             if (mReentering) {
                 if (mOriginalPosition != mNewPosition) {
-                    ViewHolder vh = (ViewHolder) mRecyclerView.findViewHolderForAdapterPosition(mNewPosition);
-                    names.clear();
-                    sharedElements.clear();
-                    names.add("image_" + mNewPosition);
-                    sharedElements.put("image_" + mNewPosition, vh.thumbnailView);
-                    names.add("toolbar");
-                    sharedElements.put("toolbar", mToolbar);
+                    mRecyclerView.requestLayout();
+                    ViewHolder vh = (ViewHolder) mRecyclerView.findViewHolderForLayoutPosition(mNewPosition);
+                    if (vh != null) {
+                        names.clear();
+                        sharedElements.clear();
+                        names.add("image_" + mNewPosition);
+                        sharedElements.put("image_" + mNewPosition, vh.thumbnailView);
+                        names.add("toolbar");
+                        sharedElements.put("toolbar", mToolbar);
+                    } else {
+                        names.clear();
+                        sharedElements.clear();
+                    }
                 }
                 mReentering = false;
             }
@@ -104,7 +109,6 @@ public class ArticleListActivity extends AppCompatActivity implements
         }
         setContentView(R.layout.activity_article_list);
         mTwoPane = findViewById(R.id.fragment_container) != null;
-        Log.d(TAG, "onCreate: " + mTwoPane);
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mAppBarLayout = (AppBarLayout) findViewById(R.id.toolbar_container);
         setSupportActionBar(mToolbar);
@@ -127,8 +131,7 @@ public class ArticleListActivity extends AppCompatActivity implements
         if (data != null && data.getExtras() != null) {
             mOriginalPosition = data.getExtras().getInt(EXTRA_OLD_ITEM_POSITION);
             mNewPosition = data.getExtras().getInt(EXTRA_NEW_ITEM_POSITION);
-            Log.d(this.toString(), "OGPosition: " + mOriginalPosition);
-            Log.d(this.toString(), "NewPosition: " + mNewPosition);
+
             if (mOriginalPosition != mNewPosition) {
                 mRecyclerView.scrollToPosition(mNewPosition);
             }
@@ -270,6 +273,7 @@ public class ArticleListActivity extends AppCompatActivity implements
             holder.thumbnailView.setAspectRatio(mCursor.getFloat(ArticleLoader.Query.ASPECT_RATIO));
             if (Utils.isLollipopOrUp()) {
                 holder.thumbnailView.setTransitionName("image_" + position);
+                holder.thumbnailView.setTag("image_" + position);
             }
         }
 
